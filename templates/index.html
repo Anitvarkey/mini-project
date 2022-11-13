@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spam Mail</title>
+</head>
+
+
+<style>
+    body {
+        background-image: url("{{ url_for('static', filename='img/anit_bg.jpg') }}");
+        background-size: 50vw;
+    }
+
+
+    .content {
+        width: 80vw;
+        line-height: 2;
+        background-color: #11222a;
+        color: #fff;
+        text-align: center;
+        margin-top: 10rem;
+    }
+
+    @media screen and (min-width: 32em) {
+        .content {
+            width: 50vw;
+        }
+    }
+
+    textarea {
+        width: 100%;
+        height: 30vh;
+        padding: 1em;
+        font-size: 1.5em;
+        text-align: left;
+        resize: none;
+        outline: none;
+    }
+
+    .boxSizing-borderBox {
+        box-sizing: border-box;
+    }
+
+    .btn {
+        cursor: pointer;
+        color: #111;
+        background-color: #f8f9fa;
+        border-color: #f8f9fa;
+        display: inline-block;
+        font-weight: 400;
+
+        padding: .375rem .75rem;
+        font-size: 1rem;
+        border-radius: .25rem;
+        margin: .9rem .5rem;
+
+        font-family: monospace;
+        font-size: large;
+
+    }
+
+    i {
+        color: #11222a;
+    }
+
+    h3 {
+        font-family: monospace;
+        font-size: large !important;
+
+    }
+
+    .output {
+        background-color: #587340;
+        color: rgb(255, 255, 255);
+        font-weight: bold;
+        font-family: monospace;
+        font-size: large;
+    }
+</style>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+
+<body>
+
+
+
+
+    <center>
+        <section class="content">
+            <h3>Mail Detection</h3>
+            <form action="predict" id="form" name="form" method="post">
+
+                <textarea id="mail-area" name="mail" class="boxSizing-borderBox" placeholder="Mail area..."></textarea>
+                <button id="predict" class="btn">Check Spam/Ham <i class="fa fa-envelope-open"></i></button>
+            </form>
+
+            <br>
+            <div class="output">
+                <hr>
+                <span class="result" style="display: none;" id="response_msg">Mail is Spam</span>
+            </div>
+        </section>
+    </center>
+
+
+    <script>
+
+
+
+        const form = document.getElementById('form');
+        const response_msg = document.getElementById('response_msg');
+        const predict_btn = document.getElementById('predict');
+
+        const mailArea = document.getElementById('mail-area');
+
+
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            response_msg.innerText = '';
+            predict_btn.style.display = 'none';
+            response_msg.style.display = 'none';
+            await uploadData(e.target);
+            predict_btn.style.display = 'inline-block';
+            response_msg.style.display = 'block';
+
+
+        });
+
+        async function uploadData(target) {
+            const response = await fetch(target.action, {
+                method: "POST",
+                body: new FormData(target)
+            });
+
+            if (!response.ok) {
+                alert('Something went wrong,Please try again');
+                return;
+            }
+
+            const fetch_response = await response.json();
+
+            response_msg.innerText = fetch_response.status_msg;
+
+        }
+
+
+        mailArea.addEventListener('keypress', (e) => {
+            let element = e.target;
+            element.style.height = 'auto';
+
+            if (element.scrollHeight > 400) {
+                element.style.height = 400 + 'px';
+                return;
+            }
+            element.style.height = element.scrollHeight + 'px';
+        });
+
+    </script>
+
+</body>
+
+</html>
